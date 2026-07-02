@@ -1,0 +1,234 @@
+from abc import ABC, abstractmethod
+
+class Bank(ABC):
+    @abstractmethod
+    def createAccount(self):
+        pass
+    @abstractmethod
+    def deposit(self):
+        pass
+    @abstractmethod
+    def withdraw(self):
+        pass
+    @abstractmethod
+    def ATM_withdraw(self):
+        pass
+    @abstractmethod
+    def checkbalance(self):
+        pass
+    @abstractmethod
+    def updateDetails(self):
+        pass
+    @abstractmethod
+    def transactionHistory(self):
+        pass
+class Account:
+
+    def __init__(self, name, aadhaar, mobile, account_no, pin, atm_card, balance, address):
+        self.__name = name
+        self.__aadhaar = aadhaar
+        self.__mobile = mobile
+        self.__account_no = account_no
+        self.__pin = pin
+        self.__atm_card = atm_card
+        self.__balance = balance
+        self.__address = address
+        self.__history = []
+
+        self.__history.append(f"Account Created with ₹{balance}")
+    def get_name(self):
+        return self.__name
+    def get_aadhaar(self):
+        return self.__aadhaar
+    def get_mobile(self):
+        return self.__mobile
+    def get_account(self):
+        return self.__account_no
+    def get_pin(self):
+        return self.__pin
+    def get_atm(self):
+        return self.__atm_card
+    def get_balance(self):
+        return self.__balance
+    def get_address(self):
+        return self.__address
+    def get_history(self):
+        return self.__history
+    def set_name(self, name):
+        self.__name = name
+    def set_mobile(self, mobile):
+        self.__mobile = mobile
+    def set_pin(self, pin):
+        self.__pin = pin
+    def set_balance(self, balance):
+        self.__balance = balance
+    def set_address(self, address):
+        self.__address = address
+    def add_history(self, message):
+        self.__history.append(message)
+
+class Customer(Bank):
+
+    def __init__(self):
+        self.accounts = []
+
+    def createAccount(self):
+        name = input("Enter Name : ")
+        aadhaar = input("Enter Aadhaar No : ")
+        mobile = input("Enter Mobile No : ")
+        account = input("Enter Account No : ")
+        pin = input("Enter ATM PIN : ")
+        atm = input("Enter ATM Card No : ")
+        balance = float(input("Enter Initial Balance : "))
+        address = input("Enter Address : ")
+        acc = Account(
+            name,
+            aadhaar,
+            mobile,
+            account,
+            pin,
+            atm,
+            balance,
+            address
+        )
+        self.accounts.append(acc)
+        print("Account Created Successfully")
+        
+    def deposit(self):
+        name = input("Enter Name : ")
+        for acc in self.accounts:
+            if acc.get_name()==name:
+                amount=float(input("Enter Deposit Amount : "))
+                acc.set_balance( acc.get_balance()+amount )
+                acc.add_history( f"Deposited ₹{amount}" )
+                print("Deposit Successful")
+                print("Available Balance :", acc.get_balance())
+                return
+        print("Account Not Found")
+        
+    def withdraw(self):
+        name = input("Enter Name : ")
+        for acc in self.accounts:
+            if acc.get_name() == name:
+                amount = float(input("Enter Withdraw Amount : "))
+                if amount <= acc.get_balance():
+                    acc.set_balance(
+                        acc.get_balance()-amount )
+                    acc.add_history( f"Withdrawn ₹{amount}" )
+                    print("Withdrawal Successful")
+                    print("Available Balance :", acc.get_balance())
+                else:
+                    print("Insufficient Balance")
+                return
+        print("Account Not Found")
+      
+    def ATM_withdraw(self):
+        card = input("Enter ATM Card Number : ")
+        pin = input("Enter ATM PIN : ")
+        for acc in self.accounts:
+            if acc.get_atm() == card and acc.get_pin() == pin:
+                amount = float(input("Enter Withdraw Amount : "))
+                if amount <= acc.get_balance():
+                    acc.set_balance( acc.get_balance() - amount  )
+                    acc.add_history( f"ATM Withdraw ₹{amount}")
+                    print("ATM Withdrawal Successful")
+                    print("Available Balance :", acc.get_balance())
+                else:
+                    print("Insufficient Balance")
+                return
+        print("Invalid ATM Card Number or PIN")
+    def checkbalance(self):
+        name = input("Enter Name : ")
+        for acc in self.accounts:
+            if acc.get_name() == name:
+                print("\n===== ACCOUNT DETAILS =====")
+                print("Name          :", acc.get_name())
+                print("Account No    :", acc.get_account())
+                print("Mobile No     :", acc.get_mobile())
+                print("Current Balance :", acc.get_balance())
+                return
+        print("Account Not Found")
+    def updateDetails(self):
+        name = input("Enter Name : ")
+        for acc in self.accounts:
+            if acc.get_name() == name:
+                print("\n===== UPDATE DETAILS =====")
+                print("1. Change Name")
+                print("2. Change Mobile Number")
+                print("3. Change ATM PIN")
+                print("4. Change Address")
+                choice = int(input("Enter Choice : "))
+                if choice == 1:
+                    new_name = input("Enter New Name : ")
+                    acc.set_name(new_name)
+                    acc.add_history("Name Updated")
+                elif choice == 2:
+                    new_mobile = input("Enter New Mobile Number : ")
+                    acc.set_mobile(new_mobile)
+                    acc.add_history("Mobile Number Updated")
+                elif choice == 3:
+                    new_pin = input("Enter New ATM PIN : ")
+                    acc.set_pin(new_pin)
+                    acc.add_history("ATM PIN Updated")
+                elif choice == 4:
+                    new_address = input("Enter New Address : ")
+                    acc.set_address(new_address)
+                    acc.add_history("Address Updated")
+                else:
+                    print("Invalid Choice")
+                    return
+                print("Details Updated Successfully")
+                return
+        print("Account Not Found")
+        
+    def transactionHistory(self):
+        name = input("Enter Name : ")
+        for acc in self.accounts:
+            if acc.get_name() == name:
+                print("\n========== TRANSACTION HISTORY ==========")
+                history = acc.get_history()
+                if len(history) == 0:
+                    print("No Transactions Found")
+                else:
+                    for i, transaction in enumerate(history, 1):
+                        print(f"{i}. {transaction}")
+                return
+        print("Account Not Found")
+obj = Customer()
+
+while True:
+    print("\n===== BANK MANAGEMENT SYSTEM =====")
+    print("1. Create Account")
+    print("2. Deposit")
+    print("3. Withdraw")
+    print("4. ATM Withdraw")
+    print("5. Check Balance")
+    print("6. Update Details")
+    print("7. Transaction History")
+    print("8. Exit")
+
+    choice = int(input("Enter Choice: "))
+
+    if choice == 1:
+        obj.createAccount()
+    elif choice == 2:
+        obj.deposit()
+    elif choice == 3:
+        obj.withdraw()
+    elif choice == 4:
+        obj.ATM_withdraw()
+    elif choice == 5:
+        obj.checkbalance()
+    elif choice == 6:
+        obj.updateDetails()
+    elif choice == 7:
+        obj.transactionHistory()
+    elif choice == 8:
+        print("Thank You For Banking With Us")
+        break
+    else:
+        print("Invalid Choice")
+        
+        
+        
+        
